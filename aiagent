@@ -1,0 +1,50 @@
+背景和目的
+普通预训练好的模型只能使用预训练的知识信息，这些数据往往停留在几年前，而定期使用latest数据全量训练各个模型的代价是不可接受的，所以AI模型无法回答未在训练数据中的特定领域知识or最新信息。
+"请告诉我今天杭州的天气状况"
+
+策略
+采用LangChain + Ollama的方案来实现本地AI Agent代码编写与调试。
+LangChainhttps://python.langchain.com/v0.2/docs/introduction/
+Agent
+
+https://lilianweng.github.io/posts/2023-06-23-agent/
+SerpApihttps://serpapi.com/
+本地Agent调用
+“2024年的NBA圣诞大战湖人和勇士的比赛结果”
+
+“给我列举一下NVIDIA发布的GeForce RTX 50系显卡的型号和定价”
+
+"给我列举一下2025年国内各大互联网公司或大模型初创公司，在大模型创新、应用的一些新闻"
+"""
+from langchain_ollama import OllamaLLM
+
+# 创建 OllamaLLM 实例
+llm = OllamaLLM(model='qwen2.5:7b')
+res = llm.invoke("请告诉我今天杭州的天气状况")
+print(res)
+"""
+
+#"""
+from langchain_ollama import OllamaLLM
+from langchain_community.agent_toolkits.load_tools import load_tools
+from langchain.agents import initialize_agent
+from langchain.agents import AgentType
+import os
+os.environ["SERPAPI_API_KEY"] = "e7b06c2901c126869d1dc2c4791b3c9c6d3a9eb84cbe6d4cbf7870a210ff2311"
+
+
+#1、加载本地ollama大模型，我们这里加载qwen2模型，对中文更友好
+llm = OllamaLLM(model='qwen2.5:7b')
+
+#2、加载在线搜索工具serpapi。
+tools = load_tools(["serpapi"], llm=llm)
+
+
+#3、最后，让我们工具、模型、代理类型等参数初始化代理，verbose=True打开日志
+agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True, handle_parsing_errors=True)
+
+#agent.invoke("给我列举一下NVIDIA发布的GeForce RTX 50系显卡的型号和定价，包括5090、5080、5070等")
+
+agent.invoke("给我列举一下2025年1月1日到2025年1月10日，国内各大互联网公司或大模型初创公司，在大模型创新、应用的一些新闻，简单总结并附上出处")
+
+#"""
