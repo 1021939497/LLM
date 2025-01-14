@@ -1,0 +1,66 @@
+背景和目的：通过Ollama大模型管理工具，一键式部署量化后的LLM模型。
+策略
+利用Ollama管理不同的大模型，通过pull对应的LLM文件进而调用大模型完成任务。
+Ollama
+Ollama是一个开源的大模型管理工具，它提供了丰富的功能，包括模型的训练、部署、监控等。 通过Ollama可以轻松地管理本地的大模型，提高模型的训练速度和部署效率。
+官网：https://ollama.com/
+下载安装Ollama
+下载安装后，在终端运行ollama -v确认安装成功
+
+支持的大模型
+qwen2.5、llama3.2、mistral、llava等
+模型库参考：https://ollama.com/search
+下载LLM
+以llava为例进行下述实验。
+下载大模型
+ollama run llava
+
+查看pull下来的模型文件
+ollama list
+
+可以根据自己的需要准备文本大模型和多模态大模型处理不同任务。
+查看模型信息
+curl http://localhost:11434/api/show -d '{"name": "llava"}'
+
+本地调用
+在终端进行交互
+简单互动
+
+描述图像内容
+
+IDE内调用
+聊天
+def easy_chat(chat):
+    content = chat
+    response = ollama.chat(model='llava', messages=[{'role': 'user', 'content': content}])
+    result = response['message']['content']
+    return result
+chat = '今天最高温度十二度有小雨，你觉得应该怎么穿衣服合适'
+print(easy_chat(chat))
+
+文本生成
+def generate_text(opt):
+    content = opt
+    response = ollama.generate(model='llava', prompt=content)
+    result = response['response']
+    return result
+opt = '给我一段描述心情愉悦的话'
+print(generate_text(opt))
+
+描述图像
+def image_describe(addr):
+    content = addr
+    prompt = '简单描述一下这张图片'
+    response = ollama.chat(model='llava', messages=[
+          {'role': 'system','content': prompt},
+          {'role': 'user','content': content},
+        ])
+    result = response['message']['content']
+    return result
+addr = './Leifeng_Pagoda_Sunset.jpg'
+print(image_describe(addr))
+
+
+参考
+Ollama API 使用指南包括Python、Java、JavaScript、C++
+https://github.com/datawhalechina/handy-ollama/blob/main/docs/C4/1.%20Ollama%20API%20%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97.md#%E4%B8%83%E5%88%97%E5%87%BA%E6%9C%AC%E5%9C%B0%E6%A8%A1%E5%9E%8B
